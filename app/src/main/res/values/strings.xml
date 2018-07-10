@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">SoftomateTestApp</string>
-    <string name="type_text">Type your text here</string>
-    <string name="cancel">Cancel</string>
+    <string name="type_text">Введите текст здесь</string>
+    <string name="cancel">Закрыть</string>
+    <string name="new_text">Новый текст</string>
+    <string name="history">История</string>
 </resources>

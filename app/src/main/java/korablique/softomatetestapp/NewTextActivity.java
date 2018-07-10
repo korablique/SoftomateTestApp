@@ -5,7 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
-public class NewTextActivity extends AppCompatActivity {
+public class NewTextActivity extends BaseActivity {
     public static final String SHOW_LANGUAGE = "SHOW_LANGUAGE";
 
     @Override
