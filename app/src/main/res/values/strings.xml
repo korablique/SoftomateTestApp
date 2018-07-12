@@ -4,4 +4,6 @@
     <string name="cancel">Закрыть</string>
     <string name="new_text">Новый текст</string>
     <string name="history">История</string>
+    <string name="used_language">Использованный язык:\ </string>
+    <string name="error">Ошибка:\ </string>
 </resources>
