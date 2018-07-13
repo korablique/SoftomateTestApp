@@ -3,11 +3,12 @@ package korablique.softomatetestapp;
 
 import android.app.Application;
 
-import korablique.softomatetestapp.language_idetification.WatsonApi;
+import korablique.softomatetestapp.database.DatabaseHolder;
+import korablique.softomatetestapp.language_identification.WatsonApi;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static korablique.softomatetestapp.language_idetification.WatsonConstants.HOST;
+import static korablique.softomatetestapp.language_identification.WatsonConstants.HOST;
 
 public class SoftomateTestAppApplication extends Application {
     private Retrofit retrofit;
@@ -22,6 +23,9 @@ public class SoftomateTestAppApplication extends Application {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         watsonApi = retrofit.create(WatsonApi.class);
+
+        DatabaseHolder databaseHolder = DatabaseHolder.getInstance();
+        databaseHolder.init(this);
     }
 
     public static WatsonApi getApi() {

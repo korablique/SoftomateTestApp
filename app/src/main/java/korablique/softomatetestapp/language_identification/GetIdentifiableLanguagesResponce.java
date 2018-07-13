@@ -1,4 +1,4 @@
-package korablique.softomatetestapp.language_idetification;
+package korablique.softomatetestapp.language_identification;
 
 import java.util.List;
 import com.google.gson.annotations.Expose;

@@ -1,4 +1,4 @@
-package korablique.softomatetestapp.language_idetification;
+package korablique.softomatetestapp.language_identification;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

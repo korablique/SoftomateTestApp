@@ -1,4 +1,4 @@
-package korablique.softomatetestapp.language_idetification;
+package korablique.softomatetestapp.language_identification;
 
 
 import android.util.Log;
@@ -12,9 +12,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static korablique.softomatetestapp.language_idetification.WatsonConstants.PASSWORD;
-import static korablique.softomatetestapp.language_idetification.WatsonConstants.USERNAME;
-import static korablique.softomatetestapp.language_idetification.WatsonConstants.VERSION;
+import static korablique.softomatetestapp.language_identification.WatsonConstants.PASSWORD;
+import static korablique.softomatetestapp.language_identification.WatsonConstants.USERNAME;
+import static korablique.softomatetestapp.language_identification.WatsonConstants.VERSION;
 
 public class IdentifiableLanguagesHandler {
     public interface GetIdentifiableLanguagesCallback {

@@ -14,6 +14,8 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import java.util.ArrayList;
 import java.util.List;
 
+import korablique.softomatetestapp.history.HistoryActivity;
+
 
 public class BaseActivity extends AppCompatActivity {
     private Drawer drawer;
@@ -50,7 +52,12 @@ public class BaseActivity extends AppCompatActivity {
         IDrawerItem itemPrimary2 = new PrimaryDrawerItem()
                 .withName(R.string.history)
                 .withSelectable(false)
-                .withIcon(R.drawable.ic_history);
+                .withIcon(R.drawable.ic_history)
+                .withOnDrawerItemClickListener((view, position, drawerItem) -> {
+                    Intent intent = new Intent(BaseActivity.this, HistoryActivity.class);
+                    BaseActivity.this.startActivity(intent);
+                    return true;
+                });
 
         List<IDrawerItem> drawerItems = new ArrayList<>();
         drawerItems.add(itemPrimary1);

@@ -13,16 +13,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-import korablique.softomatetestapp.language_idetification.IdentifyLanguageResponce;
-import korablique.softomatetestapp.language_idetification.ResultLanguage;
+import korablique.softomatetestapp.language_identification.IdentifyLanguageResponce;
+import korablique.softomatetestapp.language_identification.ResultLanguage;
 import okhttp3.Credentials;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static korablique.softomatetestapp.language_idetification.WatsonConstants.PASSWORD;
-import static korablique.softomatetestapp.language_idetification.WatsonConstants.USERNAME;
-import static korablique.softomatetestapp.language_idetification.WatsonConstants.VERSION;
+import static korablique.softomatetestapp.language_identification.WatsonConstants.PASSWORD;
+import static korablique.softomatetestapp.language_identification.WatsonConstants.USERNAME;
+import static korablique.softomatetestapp.language_identification.WatsonConstants.VERSION;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
