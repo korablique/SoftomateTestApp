@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.widget.EditText;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +27,8 @@ public class NewTextActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_text);
+
+
 
         IdentifiableLanguagesHandler languagesHandler = IdentifiableLanguagesHandler.getInstance();
         languagesHandler.getIdentifiableLanguages(languages -> {
@@ -62,6 +65,11 @@ public class NewTextActivity extends BaseActivity {
                 }
                 @Override
                 public void onFailure(Call<IdentifyLanguageResponce> call, Throwable t) {
+                    if (t instanceof UnknownHostException) {
+                        IdentificationLangDialog.showDialogWithError(
+                                getSupportFragmentManager(), getString(R.string.no_internet_connection));
+                        return;
+                    }
                     IdentificationLangDialog.showDialogWithError(getSupportFragmentManager(), t.getMessage());
                 }
             });
