@@ -1,6 +1,7 @@
 package korablique.softomatetestapp;
 
 
+import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -43,7 +44,7 @@ public class AppDatabaseTest {
         String language = "English";
         HistoryEntity historyEntity = new HistoryEntity(text, language);
         historyDao.insert(historyEntity);
-        List<HistoryEntity> historyEntityList = historyDao.getAll();
+        List<HistoryEntity> historyEntityList = historyDao.getAll().getValue();
 
         Assert.assertEquals(historyEntityList.size(), 1);
         Assert.assertEquals(historyEntityList.get(0).getText(), historyEntity.getText());

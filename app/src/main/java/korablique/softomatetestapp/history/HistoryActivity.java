@@ -1,6 +1,6 @@
 package korablique.softomatetestapp.history;
 
-import android.support.v7.app.AppCompatActivity;
+import android.arch.lifecycle.LiveData;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,7 +11,6 @@ import java.util.List;
 import korablique.softomatetestapp.BaseActivity;
 import korablique.softomatetestapp.R;
 import korablique.softomatetestapp.database.AppDatabase;
-import korablique.softomatetestapp.database.BackgroundThreadExecutor;
 import korablique.softomatetestapp.database.DatabaseHolder;
 import korablique.softomatetestapp.database.HistoryDao;
 import korablique.softomatetestapp.database.HistoryEntity;
@@ -38,12 +37,9 @@ public class HistoryActivity extends BaseActivity {
         AppDatabase db = databaseHolder.getDatabase();
         HistoryDao historyDao = db.historyDao();
 
-        BackgroundThreadExecutor executor = BackgroundThreadExecutor.getInstance();
-        executor.execute(() -> {
-            List<HistoryEntity> historyEntityList = historyDao.getAll();
-            runOnUiThread(() -> {
-                adapter.addItems(historyEntityList);
-            });
+        LiveData<List<HistoryEntity>> liveData = historyDao.getAll();
+        liveData.observe(this, historyEntities -> {
+            adapter.replaceItems(historyEntities);
         });
     }
 }

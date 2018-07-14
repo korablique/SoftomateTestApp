@@ -27,11 +27,14 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryItemViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull HistoryItemViewHolder holder, int position) {
+        // we need to insert new elements to the top
+        int reversedPosition = historyEntityList.size() - position - 1;
+
         ViewGroup item = holder.getItem();
         TextView textView = item.findViewById(R.id.text);
-        textView.setText(historyEntityList.get(position).getText());
+        textView.setText(historyEntityList.get(reversedPosition).getText());
         TextView languageTextView = item.findViewById(R.id.language);
-        languageTextView.setText(historyEntityList.get(position).getLanguage());
+        languageTextView.setText(historyEntityList.get(reversedPosition).getLanguage());
     }
 
     @Override
@@ -39,7 +42,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryItemViewHolder> 
         return historyEntityList.size();
     }
 
-    public void addItems(List<HistoryEntity> items) {
+    public void replaceItems(List<HistoryEntity> items) {
+        historyEntityList.clear();
         historyEntityList.addAll(items);
         notifyDataSetChanged();
     }
