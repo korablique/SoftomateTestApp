@@ -2,8 +2,10 @@ package korablique.softomatetestapp.language_identification;
 
 
 import android.content.Context;
+import android.util.Log;
 
 import java.net.UnknownHostException;
+import java.util.List;
 
 import korablique.softomatetestapp.R;
 import korablique.softomatetestapp.SoftomateTestAppApplication;
@@ -25,6 +27,7 @@ public class LanguageIdentificator {
         void onResult(String language);
         void onFailure(String errorMessage);
     }
+    public static final String TAG = LanguageIdentificator.class.getName();
     private Context context;
     private AppDatabase db;
 
@@ -45,31 +48,15 @@ public class LanguageIdentificator {
                         @Override
                         public void onResponse(Call<IdentifyLanguageResponce> call, Response<IdentifyLanguageResponce> response) {
                             if (response.body() != null) {
-                                String language = response.body().getLanguages().get(0).getLanguage();
-                                String languageName = null;
-
-                                for (IdentifiableLanguage l : identifiableLanguages) {
-                                    if (l.getLanguage().equals(language)) {
-                                        languageName = l.getName();
-                                        break;
-                                    }
-                                }
-                                // if loading identifiable languages has failed
-                                if (languageName == null) {
-                                    languageName = language;
-                                }
-
-                                HistoryEntity historyEntity = new HistoryEntity(text, languageName);
-                                BackgroundThreadExecutor executor = BackgroundThreadExecutor.getInstance();
-                                executor.execute(() -> {
-                                    db.historyDao().insert(historyEntity);
-                                });
-
+                                List<ResultLanguage> guessedLanguages = response.body().getLanguages();
+                                String languageName = getLanguageName(guessedLanguages, identifiableLanguages);
+                                writeToDb(text, languageName);
                                 callback.onResult(languageName);
                             } else {
                                 callback.onFailure(response.message());
                             }
                         }
+
                         @Override
                         public void onFailure(Call<IdentifyLanguageResponce> call, Throwable t) {
                             if (t instanceof UnknownHostException) {
@@ -79,6 +66,35 @@ public class LanguageIdentificator {
                             callback.onFailure(t.getMessage());
                         }
                     });
+        }, t -> {
+            Log.e(TAG, "Could not get identifiable languages", t);
+        });
+    }
+
+    private String getLanguageName(
+            List<ResultLanguage> guessedResponse,
+            List<IdentifiableLanguage> identifiableLanguages) {
+        String language = guessedResponse.get(0).getLanguage();
+        String languageName = null;
+
+        for (IdentifiableLanguage l : identifiableLanguages) {
+            if (l.getLanguage().equals(language)) {
+                languageName = l.getName();
+                break;
+            }
+        }
+        // if loading identifiable languages has failed
+        if (languageName == null) {
+            languageName = language;
+        }
+        return languageName;
+    }
+
+    private void writeToDb(String text, String language) {
+        HistoryEntity historyEntity = new HistoryEntity(text, language);
+        BackgroundThreadExecutor executor = BackgroundThreadExecutor.getInstance();
+        executor.execute(() -> {
+            db.historyDao().insert(historyEntity);
         });
     }
 }

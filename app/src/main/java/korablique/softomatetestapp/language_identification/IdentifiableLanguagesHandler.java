@@ -17,32 +17,17 @@ import static korablique.softomatetestapp.language_identification.WatsonConstant
 import static korablique.softomatetestapp.language_identification.WatsonConstants.VERSION;
 
 public class IdentifiableLanguagesHandler {
-    public interface GetIdentifiableLanguagesCallback {
+    public interface SuccessCallback {
         void onResult(List<IdentifiableLanguage> languages);
+    }
+    public interface FailCallback {
+        void onFailure(Throwable t);
     }
     private static IdentifiableLanguagesHandler instance;
     private List<IdentifiableLanguage> identifiableLanguages = new ArrayList<>();
-    private List<GetIdentifiableLanguagesCallback> callbacks = new ArrayList<>();
 
     private IdentifiableLanguagesHandler() {
-        String credentials = Credentials.basic(USERNAME, PASSWORD);
-        SoftomateTestAppApplication.getApi().getIdentifiableLanguages(credentials, VERSION)
-                .enqueue(new Callback<GetIdentifiableLanguagesResponce>() {
-                    @Override
-                    public void onResponse(Call<GetIdentifiableLanguagesResponce> call, Response<GetIdentifiableLanguagesResponce> response) {
-                        if (response.body() != null) {
-                            identifiableLanguages.addAll(response.body().getLanguages());
-                            for (GetIdentifiableLanguagesCallback callback : callbacks) {
-                                callback.onResult(identifiableLanguages);
-                            }
-                            callbacks.clear();
-                        }
-                    }
-                    @Override
-                    public void onFailure(Call<GetIdentifiableLanguagesResponce> call, Throwable t) {
-                        Log.e(IdentifiableLanguagesHandler.class.getName(), t.getMessage(), t);
-                    }
-                });
+
     }
 
     public static synchronized IdentifiableLanguagesHandler getInstance() {
@@ -52,11 +37,34 @@ public class IdentifiableLanguagesHandler {
         return instance;
     }
 
-    public void getIdentifiableLanguages(GetIdentifiableLanguagesCallback callback) {
+    public void getIdentifiableLanguages(SuccessCallback successCallback, FailCallback failCallback) {
         if (!identifiableLanguages.isEmpty()) {
-            callback.onResult(identifiableLanguages);
+            successCallback.onResult(identifiableLanguages);
         } else {
-            callbacks.add(callback);
+            performRequest(successCallback, failCallback);
         }
+    }
+
+    private void performRequest(SuccessCallback successCallback, FailCallback failCallback) {
+        String credentials = Credentials.basic(USERNAME, PASSWORD);
+        SoftomateTestAppApplication.getApi().getIdentifiableLanguages(credentials, VERSION)
+                .enqueue(new Callback<GetIdentifiableLanguagesResponce>() {
+                    @Override
+                    public void onResponse(
+                            Call<GetIdentifiableLanguagesResponce> call,
+                            Response<GetIdentifiableLanguagesResponce> response) {
+                        if (response.body() != null) {
+                            identifiableLanguages.addAll(response.body().getLanguages());
+                            successCallback.onResult(identifiableLanguages);
+                        } else {
+                            failCallback.onFailure(new IllegalStateException("Empty response: " + response.message()));
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<GetIdentifiableLanguagesResponce> call, Throwable t) {
+                        Log.e(IdentifiableLanguagesHandler.class.getName(), t.getMessage(), t);
+                        failCallback.onFailure(t);
+                    }
+                });
     }
 }
