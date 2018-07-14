@@ -9,10 +9,9 @@ import java.util.List;
 
 import korablique.softomatetestapp.R;
 import korablique.softomatetestapp.SoftomateTestAppApplication;
-import korablique.softomatetestapp.database.AppDatabase;
-import korablique.softomatetestapp.database.BackgroundThreadExecutor;
-import korablique.softomatetestapp.database.DatabaseHolder;
-import korablique.softomatetestapp.database.HistoryEntity;
+import korablique.softomatetestapp.language_identification.retrofit.IdentifiableLanguage;
+import korablique.softomatetestapp.language_identification.retrofit.IdentifyLanguageResponse;
+import korablique.softomatetestapp.language_identification.retrofit.ResultLanguage;
 import okhttp3.Credentials;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -23,49 +22,27 @@ import static korablique.softomatetestapp.language_identification.WatsonConstant
 import static korablique.softomatetestapp.language_identification.WatsonConstants.VERSION;
 
 public class LanguageIdentificator {
-    public interface LanguageIdentificationCallback {
+    public interface SuccessCallback {
         void onResult(String language);
+    }
+    public interface FailCallback {
         void onFailure(String errorMessage);
     }
     public static final String TAG = LanguageIdentificator.class.getName();
     private Context context;
-    private AppDatabase db;
 
     public LanguageIdentificator(Context context) {
         this.context = context;
-
-        DatabaseHolder databaseHolder = DatabaseHolder.getInstance();
-        db = databaseHolder.getDatabase();
     }
 
-    public void identifyLanguage(String text, LanguageIdentificationCallback callback) {
+    public void identifyLanguage(String text, SuccessCallback successCallback, FailCallback failCallback) {
         String credentials = Credentials.basic(USERNAME, PASSWORD);
 
+        WatsonApi watson = SoftomateTestAppApplication.getWatsonApi();
         IdentifiableLanguagesHandler languagesHandler = IdentifiableLanguagesHandler.getInstance();
         languagesHandler.getIdentifiableLanguages(identifiableLanguages -> {
-            SoftomateTestAppApplication.getApi().identifyLanguage(credentials, text, VERSION)
-                    .enqueue(new Callback<IdentifyLanguageResponce>() {
-                        @Override
-                        public void onResponse(Call<IdentifyLanguageResponce> call, Response<IdentifyLanguageResponce> response) {
-                            if (response.body() != null) {
-                                List<ResultLanguage> guessedLanguages = response.body().getLanguages();
-                                String languageName = getLanguageName(guessedLanguages, identifiableLanguages);
-                                writeToDb(text, languageName);
-                                callback.onResult(languageName);
-                            } else {
-                                callback.onFailure(response.message());
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<IdentifyLanguageResponce> call, Throwable t) {
-                            if (t instanceof UnknownHostException) {
-                                callback.onFailure(context.getString(R.string.no_internet_connection));
-                                return;
-                            }
-                            callback.onFailure(t.getMessage());
-                        }
-                    });
+            watson.identifyLanguage(credentials, text, VERSION)
+                    .enqueue(new CallbackImpl(identifiableLanguages, successCallback, failCallback));
         }, t -> {
             Log.e(TAG, "Could not get identifiable languages", t);
         });
@@ -87,14 +64,42 @@ public class LanguageIdentificator {
         if (languageName == null) {
             languageName = language;
         }
+
         return languageName;
     }
 
-    private void writeToDb(String text, String language) {
-        HistoryEntity historyEntity = new HistoryEntity(text, language);
-        BackgroundThreadExecutor executor = BackgroundThreadExecutor.getInstance();
-        executor.execute(() -> {
-            db.historyDao().insert(historyEntity);
-        });
+    private class CallbackImpl implements Callback<IdentifyLanguageResponse> {
+        private List<IdentifiableLanguage> identifiableLanguages;
+        private SuccessCallback clientSuccessCallback;
+        private FailCallback clientFailCallback;
+
+        CallbackImpl(
+                List<IdentifiableLanguage> identifiableLanguages,
+                SuccessCallback clientSuccessCallback,
+                FailCallback clientFailCallback) {
+            this.identifiableLanguages = identifiableLanguages;
+            this.clientSuccessCallback = clientSuccessCallback;
+            this.clientFailCallback = clientFailCallback;
+        }
+
+        @Override
+        public void onResponse(Call<IdentifyLanguageResponse> call, Response<IdentifyLanguageResponse> response) {
+            if (response.body() != null) {
+                List<ResultLanguage> guessedLanguages = response.body().getLanguages();
+                String languageName = getLanguageName(guessedLanguages, identifiableLanguages);
+                clientSuccessCallback.onResult(languageName);
+            } else {
+                clientFailCallback.onFailure(response.message());
+            }
+        }
+
+        @Override
+        public void onFailure(Call<IdentifyLanguageResponse> call, Throwable t) {
+            if (t instanceof UnknownHostException) {
+                clientFailCallback.onFailure(context.getString(R.string.no_internet_connection));
+                return;
+            }
+            clientFailCallback.onFailure(t.getMessage());
+        }
     }
 }

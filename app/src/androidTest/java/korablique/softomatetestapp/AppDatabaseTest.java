@@ -1,7 +1,6 @@
 package korablique.softomatetestapp;
 
 
-import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -15,7 +14,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import korablique.softomatetestapp.database.AppDatabase;
 import korablique.softomatetestapp.database.HistoryDao;
@@ -44,10 +45,17 @@ public class AppDatabaseTest {
         String language = "English";
         HistoryEntity historyEntity = new HistoryEntity(text, language);
         historyDao.insert(historyEntity);
-        List<HistoryEntity> historyEntityList = historyDao.getAll().getValue();
+        List<HistoryEntity> changed = new ArrayList<>();
 
-        Assert.assertEquals(historyEntityList.size(), 1);
-        Assert.assertEquals(historyEntityList.get(0).getText(), historyEntity.getText());
-        Assert.assertEquals(historyEntityList.get(0).getLanguage(), historyEntity.getLanguage());
+        CountDownLatch mutex = new CountDownLatch(1);
+        historyDao.getAll().observeForever(historyEntities -> {
+            changed.addAll(historyEntities);
+            mutex.countDown();
+        });
+        mutex.await();
+
+        Assert.assertEquals(1, changed.size());
+        Assert.assertEquals(historyEntity.getText(), changed.get(0).getText());
+        Assert.assertEquals(historyEntity.getLanguage(), changed.get(0).getLanguage());
     }
 }

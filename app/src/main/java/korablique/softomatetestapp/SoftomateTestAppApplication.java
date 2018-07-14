@@ -11,14 +11,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import static korablique.softomatetestapp.language_identification.WatsonConstants.HOST;
 
 public class SoftomateTestAppApplication extends Application {
-    private Retrofit retrofit;
     private static WatsonApi watsonApi;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        retrofit = new Retrofit.Builder()
+        Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(HOST)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
@@ -28,7 +27,7 @@ public class SoftomateTestAppApplication extends Application {
         databaseHolder.init(this);
     }
 
-    public static WatsonApi getApi() {
+    public static WatsonApi getWatsonApi() {
         return watsonApi;
     }
 }

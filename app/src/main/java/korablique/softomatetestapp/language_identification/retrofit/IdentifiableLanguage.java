@@ -1,4 +1,4 @@
-package korablique.softomatetestapp.language_identification;
+package korablique.softomatetestapp.language_identification.retrofit;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -15,15 +15,7 @@ public class IdentifiableLanguage {
         return language;
     }
 
-    public void setLanguage(String language) {
-        this.language = language;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 }

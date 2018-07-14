@@ -1,4 +1,4 @@
-package korablique.softomatetestapp.language_identification;
+package korablique.softomatetestapp.language_identification.retrofit;
 
 import android.support.annotation.NonNull;
 
@@ -19,14 +19,6 @@ public class ResultLanguage implements Comparable<ResultLanguage> {
 
     public void setLanguage(String language) {
         this.language = language;
-    }
-
-    public Double getConfidence() {
-        return confidence;
-    }
-
-    public void setConfidence(Double confidence) {
-        this.confidence = confidence;
     }
 
     @Override

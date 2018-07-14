@@ -15,9 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import korablique.softomatetestapp.history.HistoryActivity;
+import korablique.softomatetestapp.new_text.NewTextActivity;
 
 
-public class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity {
     private Drawer drawer;
 
     @Override

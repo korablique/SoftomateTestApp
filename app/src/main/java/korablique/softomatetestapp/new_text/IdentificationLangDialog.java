@@ -1,4 +1,4 @@
-package korablique.softomatetestapp;
+package korablique.softomatetestapp.new_text;
 
 import android.app.Dialog;
 import android.os.Bundle;
@@ -6,6 +6,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
+
+import korablique.softomatetestapp.R;
 
 
 public class IdentificationLangDialog extends DialogFragment {

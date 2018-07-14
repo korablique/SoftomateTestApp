@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-import korablique.softomatetestapp.language_identification.IdentifyLanguageResponce;
-import korablique.softomatetestapp.language_identification.ResultLanguage;
+import korablique.softomatetestapp.language_identification.retrofit.IdentifyLanguageResponse;
+import korablique.softomatetestapp.language_identification.retrofit.ResultLanguage;
 import okhttp3.Credentials;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -33,15 +33,15 @@ public class WatsonApiTest {
         final List<ResultLanguage> resultLanguages = new ArrayList<>();
         String credentials = Credentials.basic(USERNAME, PASSWORD);
         String englishText = "Language translator translates text from one language to another";
-        SoftomateTestAppApplication.getApi().identifyLanguage(
-                credentials, englishText, VERSION).enqueue(new Callback<IdentifyLanguageResponce>() {
+        SoftomateTestAppApplication.getWatsonApi().identifyLanguage(
+                credentials, englishText, VERSION).enqueue(new Callback<IdentifyLanguageResponse>() {
             @Override
-            public void onResponse(@NonNull Call<IdentifyLanguageResponce> call, @NonNull Response<IdentifyLanguageResponce> response) {
+            public void onResponse(@NonNull Call<IdentifyLanguageResponse> call, @NonNull Response<IdentifyLanguageResponse> response) {
                 resultLanguages.addAll(response.body().getLanguages());
                 mutex1.countDown();
             }
             @Override
-            public void onFailure(@NonNull Call<IdentifyLanguageResponce> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<IdentifyLanguageResponse> call, @NonNull Throwable t) {
                 mutex1.countDown();
             }
         });
@@ -52,15 +52,15 @@ public class WatsonApiTest {
         CountDownLatch mutex2 = new CountDownLatch(1);
         resultLanguages.clear();
         String russianText = "Переводчик переводит текст с одного языка на другой";
-        SoftomateTestAppApplication.getApi().identifyLanguage(
-                credentials, russianText, VERSION).enqueue(new Callback<IdentifyLanguageResponce>() {
+        SoftomateTestAppApplication.getWatsonApi().identifyLanguage(
+                credentials, russianText, VERSION).enqueue(new Callback<IdentifyLanguageResponse>() {
             @Override
-            public void onResponse(@NonNull Call<IdentifyLanguageResponce> call, @NonNull Response<IdentifyLanguageResponce> response) {
+            public void onResponse(@NonNull Call<IdentifyLanguageResponse> call, @NonNull Response<IdentifyLanguageResponse> response) {
                 resultLanguages.addAll(response.body().getLanguages());
                 mutex2.countDown();
             }
             @Override
-            public void onFailure(@NonNull Call<IdentifyLanguageResponce> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<IdentifyLanguageResponse> call, @NonNull Throwable t) {
                 mutex2.countDown();
             }
         });

@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import korablique.softomatetestapp.SoftomateTestAppApplication;
+import korablique.softomatetestapp.language_identification.retrofit.GetIdentifiableLanguagesResponse;
+import korablique.softomatetestapp.language_identification.retrofit.IdentifiableLanguage;
 import okhttp3.Credentials;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -23,17 +25,15 @@ public class IdentifiableLanguagesHandler {
     public interface FailCallback {
         void onFailure(Throwable t);
     }
-    private static IdentifiableLanguagesHandler instance;
+    private static IdentifiableLanguagesHandler instance = new IdentifiableLanguagesHandler();
     private List<IdentifiableLanguage> identifiableLanguages = new ArrayList<>();
 
     private IdentifiableLanguagesHandler() {
-
+        // preventive loading
+        performRequest((unused) -> {}, (unused) -> {});
     }
 
-    public static synchronized IdentifiableLanguagesHandler getInstance() {
-        if (instance == null) {
-            instance = new IdentifiableLanguagesHandler();
-        }
+    public static IdentifiableLanguagesHandler getInstance() {
         return instance;
     }
 
@@ -47,12 +47,12 @@ public class IdentifiableLanguagesHandler {
 
     private void performRequest(SuccessCallback successCallback, FailCallback failCallback) {
         String credentials = Credentials.basic(USERNAME, PASSWORD);
-        SoftomateTestAppApplication.getApi().getIdentifiableLanguages(credentials, VERSION)
-                .enqueue(new Callback<GetIdentifiableLanguagesResponce>() {
+        SoftomateTestAppApplication.getWatsonApi().getIdentifiableLanguages(credentials, VERSION)
+                .enqueue(new Callback<GetIdentifiableLanguagesResponse>() {
                     @Override
                     public void onResponse(
-                            Call<GetIdentifiableLanguagesResponce> call,
-                            Response<GetIdentifiableLanguagesResponce> response) {
+                            Call<GetIdentifiableLanguagesResponse> call,
+                            Response<GetIdentifiableLanguagesResponse> response) {
                         if (response.body() != null) {
                             identifiableLanguages.addAll(response.body().getLanguages());
                             successCallback.onResult(identifiableLanguages);
@@ -61,7 +61,7 @@ public class IdentifiableLanguagesHandler {
                         }
                     }
                     @Override
-                    public void onFailure(Call<GetIdentifiableLanguagesResponce> call, Throwable t) {
+                    public void onFailure(Call<GetIdentifiableLanguagesResponse> call, Throwable t) {
                         Log.e(IdentifiableLanguagesHandler.class.getName(), t.getMessage(), t);
                         failCallback.onFailure(t);
                     }
